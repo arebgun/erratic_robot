@@ -1,0 +1,79 @@
+diff -urN ./cmake/internal/DriverUtils.cmake ../player-svn.new/cmake/internal/DriverUtils.cmake
+--- ./cmake/internal/DriverUtils.cmake	2008-11-18 23:01:32.000000000 -0800
++++ ../player-svn.new/cmake/internal/DriverUtils.cmake	2009-01-08 16:52:14.940210814 -0800
+@@ -159,7 +159,7 @@
+ # _cumulativeVar:   The option used in the calling CMakeLists.txt to check if
+ #                   the driver has been enabled.
+ # _package:         Name (and possibly version) of the package to look for.
+-INCLUDE (FindPkgConfig)
++INCLUDE($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+ MACRO (PLAYERDRIVER_REQUIRE_PKG _name _cumulativeVar _package _includeDir _libDir _linkFlags _cFlags)
+     IF (NOT PKG_CONFIG_FOUND)
+         MESSAGE (FATAL_ERROR "Could not find pkg-config.")
+diff -urN ./cmake/internal/SearchForStuff.cmake ../player-svn.new/cmake/internal/SearchForStuff.cmake
+--- ./cmake/internal/SearchForStuff.cmake	2008-11-18 23:01:32.000000000 -0800
++++ ../player-svn.new/cmake/internal/SearchForStuff.cmake	2009-01-08 16:52:25.847711292 -0800
+@@ -82,7 +82,7 @@
+ TEST_BIG_ENDIAN (WORDS_BIGENDIAN)
+ 
+ # GTK checks
+-INCLUDE (FindPkgConfig)
++INCLUDE($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+ IF (NOT PKG_CONFIG_FOUND)
+     MESSAGE (STATUS "WARNING: Could not find pkg-config; cannot search for GTK or related.")
+ ELSE (NOT PKG_CONFIG_FOUND)
+diff -urN ./cmake/UsePlayerC.cmake ../player-svn.new/cmake/UsePlayerC.cmake
+--- ./cmake/UsePlayerC.cmake	2008-11-18 23:01:32.000000000 -0800
++++ ../player-svn.new/cmake/UsePlayerC.cmake	2009-01-08 16:51:27.297713167 -0800
+@@ -1,7 +1,7 @@
+ CMAKE_MINIMUM_REQUIRED (VERSION 2.4 FATAL_ERROR)
+ INCLUDE (PlayerUtils)
+ 
+-INCLUDE (FindPkgConfig)
++INCLUDE($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+ IF (NOT PKG_CONFIG_FOUND)
+     MESSAGE (FATAL_ERROR "Could not find pkg-config.")
+ ELSE (NOT PKG_CONFIG_FOUND)
+diff -urN ./cmake/UsePlayerC++.cmake ../player-svn.new/cmake/UsePlayerC++.cmake
+--- ./cmake/UsePlayerC++.cmake	2008-11-18 23:01:32.000000000 -0800
++++ ../player-svn.new/cmake/UsePlayerC++.cmake	2009-01-08 16:51:39.747978064 -0800
+@@ -1,7 +1,7 @@
+ CMAKE_MINIMUM_REQUIRED (VERSION 2.4 FATAL_ERROR)
+ INCLUDE (PlayerUtils)
+ 
+-INCLUDE (FindPkgConfig)
++INCLUDE($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+ IF (NOT PKG_CONFIG_FOUND)
+     MESSAGE (FATAL_ERROR "Could not find pkg-config.")
+ ELSE (NOT PKG_CONFIG_FOUND)
+diff -urN ./cmake/UsePlayerPlugin.cmake ../player-svn.new/cmake/UsePlayerPlugin.cmake
+--- ./cmake/UsePlayerPlugin.cmake	2008-11-18 23:01:32.000000000 -0800
++++ ../player-svn.new/cmake/UsePlayerPlugin.cmake	2009-01-08 16:51:52.148960535 -0800
+@@ -1,7 +1,7 @@
+ CMAKE_MINIMUM_REQUIRED (VERSION 2.4 FATAL_ERROR)
+ INCLUDE (PlayerUtils)
+ 
+-INCLUDE (FindPkgConfig)
++INCLUDE($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+ IF (NOT PKG_CONFIG_FOUND)
+     MESSAGE (FATAL_ERROR "Could not find pkg-config.")
+ ELSE (NOT PKG_CONFIG_FOUND)
+@@ -13,7 +13,7 @@
+ LIST_TO_STRING (PLUGIN_PLAYERC_CFLAGS_STR "${PLUGIN_PLAYERC_CFLAGS}")
+ LIST_TO_STRING (PLUGIN_PLAYERC_LDFLAGS_STR "${PLUGIN_PLAYERC_LDFLAGS}")
+ 
+-INCLUDE (FindPkgConfig)
++INCLUDE($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+ IF (NOT PKG_CONFIG_FOUND)
+     MESSAGE (FATAL_ERROR "Could not find pkg-config.")
+ ELSE (NOT PKG_CONFIG_FOUND)
+diff -urN ./CMakeLists.txt ../player-svn.new/CMakeLists.txt
+--- ./CMakeLists.txt	2008-11-18 23:01:42.000000000 -0800
++++ ../player-svn.new/CMakeLists.txt	2009-01-08 16:49:55.070210399 -0800
+@@ -1,4 +1,5 @@
+-CMAKE_MINIMUM_REQUIRED (VERSION 2.4.7 FATAL_ERROR)
++#CMAKE_MINIMUM_REQUIRED (VERSION 2.4.7 FATAL_ERROR)
++CMAKE_MINIMUM_REQUIRED (VERSION 2.4.7)
+ 
+ # Compatibility settings
+ IF (COMMAND CMAKE_POLICY)
