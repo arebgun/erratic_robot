@@ -1,0 +1,8 @@
+<launch>
+    <include file="$(find erratic_navigation)/navigation_local/move_base_local.launch" />
+    
+    <!-- costmap_2d markers -->
+    <node pkg="costmap_2d" type="costmap_2d_markers" name="voxel_visualizer">
+        <remap from="voxel_grid" to="move_base_node/local_costmap/voxel_grid_throttled"/>
+    </node>
+</launch>

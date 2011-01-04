@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find gazebo_worlds)/launch/wg_world.launch"/>
+    <include file="$(find erratic_description)/launch/erratic_laser_mobile_base.launch" />
+</launch>

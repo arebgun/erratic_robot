@@ -1,0 +1,23 @@
+<package>
+    <description brief="erratic_gazebo_plugins">
+    Contains a differential drive plugin that works with the erratic robot model provided
+    in the erratic_description package. The plugin may also work for other differential drive 
+    robots. The purpose of this custom plugin is to build the ROS functionality directly into a 
+    proper Gazebo plugin, rather than a node that communicates with Gazebo. 
+    </description>
+    
+    <author>Daniel Hewlett</author>
+    <license>BSD</license>
+    <review status="unreviewed" notes=""/>
+    <url>http://ros.org/wiki/erratic_gazebo_plugins</url>
+    <depend package="roscpp"/>
+    <depend package="gazebo"/>
+    <depend package="gazebo_plugins"/>
+
+    <export>
+        <gazebo plugin_path="${prefix}/lib" />
+    </export>    
+
+</package>
+
+

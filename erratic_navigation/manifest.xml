@@ -1,0 +1,16 @@
+<package>
+    <description brief="erratic_navigation">
+        erratic_navigation
+    </description>
+
+    <author>Antons Rebguns</author>
+    <license>BSD</license>
+    <review status="unreviewed" notes=""/>
+    <url>http://ros.org/wiki/erratic_navigation</url>
+
+    <depend package="move_base"/>
+    <depend package="amcl"/>
+    <depend package="gmapping"/>
+    <depend package="topic_tools" />
+</package>
+

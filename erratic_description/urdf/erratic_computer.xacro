@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<robot
+    xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+    xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+    xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+    
+    <property name="computer_size_x" value="0.170" />
+    <property name="computer_size_y" value="0.175" />
+    <property name="computer_size_z" value="0.056" />
+    
+    <macro name="erratic_computer" params="parent">
+        <joint name="computer_mount_joint" type="fixed">
+            <origin xyz="-${top_size_x/2 - 0.0254 - computer_size_y/2} ${top_size_y/2 - 0.1 - computer_size_y/2} ${top_size_z/2}" />
+            <parent link="${parent}" />
+            <child link="computer_link" />
+        </joint>
+        
+        <link name="computer_link"> 
+            <inertial>
+                <mass value="2"/>
+                <origin xyz="0 0 ${computer_size_z/2}" rpy="0 0 0" />
+                <inertia    ixx="0.1" ixy="0" ixz="0" 
+                            iyy="0.1" iyz="0" 
+                            izz="0.1"/>
+            </inertial>
+            
+            <visual>
+                <origin xyz="0 0 ${computer_size_z/2}" rpy="0 0 0" />
+                <geometry>
+                    <box size="${computer_size_x} ${computer_size_y} ${computer_size_z}"/>
+                </geometry>
+            </visual>
+            
+            <collision>
+                <origin xyz="0 0 ${computer_size_z/2}" rpy="0 0 0" />
+                <geometry>
+                    <box size="${computer_size_x} ${computer_size_y} ${computer_size_z}"/>
+                </geometry>
+            </collision>
+        </link>
+        
+        <gazebo reference="computer_link">
+            <material>Erratic/BlueBrushedAluminum</material>
+        </gazebo>
+    </macro>
+</robot>
+

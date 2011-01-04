@@ -1,0 +1,8 @@
+<launch>
+
+    <node name="gazebo" pkg="gazebo" type="gazebo" 
+          args="$(find gazebo_worlds)/worlds/empty.world" output="screen" respawn="false" />
+    
+    <include file="$(find erratic_description)/launch/erratic_laser_mobile_base.launch" />
+
+</launch>

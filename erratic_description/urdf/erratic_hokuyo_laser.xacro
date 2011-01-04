@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+
+<robot
+    xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+    xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+    xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+    
+    <macro name="erratic_hokuyo_laser" params="parent *origin">
+        <joint name="laser_base_mount_joint" type="fixed">
+            <insert_block name="origin" /> 
+            <parent link="${parent}"/>
+            <child link="laser_base_link"/>
+        </joint>
+        
+        <link name="laser_base_link" type="fixed">
+            <inertial>
+                <mass value="0.1"/>
+                <origin xyz="0 0 0.0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+            </inertial>
+            
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0 0.025"/>
+                <geometry>
+                    <box size="0.05 0.05 0.05"/>
+                </geometry>
+            </visual>
+            
+            <collision>
+                <origin rpy="0 0 0" xyz="0 0 0.025"/>
+                <geometry>
+                    <box size="0.05 0.05 0.05"/>
+                </geometry>
+            </collision>
+        </link>
+        
+        <joint name="base_scan_joint" type="fixed" >
+            <origin xyz="0 0 0.05" rpy="0 0 0" />
+            <parent link="laser_base_link" />
+            <child link="base_scan_link"/>
+        </joint>
+        
+        <link name="base_scan_link" type="laser">
+            <inertial>
+                <mass value="0.1"/>
+                <origin xyz="0 0 0.0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+            </inertial>
+            
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0 0.014"/>
+                <geometry>
+                    <cylinder radius="0.0229" length="0.028"/>
+                </geometry>
+            </visual>
+            
+            <collision>
+                <origin rpy="0 0 0" xyz="0 0 0.014"/>
+                <geometry>
+                    <cylinder radius="0.0229" length="0.028"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="base_scan_link">
+            <sensor:ray name="laser">
+                <rayCount>683</rayCount>
+                <rangeCount>683</rangeCount>
+                <laserCount>1</laserCount>
+                
+                <origin>0.0 0.0 0.0</origin>
+                <displayRays>false</displayRays>
+                
+                <minAngle>-135</minAngle>
+                <maxAngle> 135</maxAngle>
+                
+                <minRange>0.06</minRange>
+                <maxRange>4.0</maxRange>
+                <resRange>0.001</resRange>
+                <updateRate>10.0</updateRate>
+                
+                <controller:gazebo_ros_laser name="gazebo_ros_base_scan_link_controller" plugin="libgazebo_ros_laser.so">
+                    <gaussianNoise>0.005</gaussianNoise>
+                    <alwaysOn>true</alwaysOn>
+                    <updateRate>10.0</updateRate>
+                    <topicName>base_scan/scan</topicName>
+                    <frameName>base_scan_link</frameName>
+                    <interface:laser name="gazebo_ros_base_scan_link_iface"/>
+                </controller:gazebo_ros_laser>
+            </sensor:ray>
+        </gazebo>
+        
+        <gazebo reference="laser_base_link">
+            <material>Erratic/Grey</material>
+        </gazebo>
+        
+        <gazebo reference="base_scan_link">
+            <material>Erratic/Black</material>
+        </gazebo>
+    </macro>
+</robot>
+

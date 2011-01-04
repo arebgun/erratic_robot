@@ -1,0 +1,8 @@
+<launch>
+    <include file="$(find erratic_description)/launch/erratic_laser_wg_world.launch" />
+
+    <node name="map_node" pkg="map_server" type="map_server" 
+          args="$(find wubble_environments)/Media/materials/textures/empty_map.yaml" respawn="true" output="screen" />
+
+    <include file="$(find erratic_navigation_apps)/launch/erratic_2dnav_local.launch" />
+</launch>

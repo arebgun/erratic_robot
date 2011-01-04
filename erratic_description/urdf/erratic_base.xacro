@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+
+<robot
+    xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+    xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+    xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+    <!-- Included URDF Files -->
+    <include filename="$(find erratic_description)/urdf/materials.urdf.xacro" />
+    <include filename="$(find erratic_description)/urdf/erratic_computer.xacro" />
+    <include filename="$(find erratic_description)/urdf/erratic_wheel.xacro" />
+
+    <!-- Properties (Constants) -->
+    <property name="M_PI" value="3.14159"/>
+    
+    <property name="base_size_x" value="0.217" />
+    <property name="base_size_y" value="0.280" />
+    <property name="base_size_z" value="0.155" />
+    
+    <property name="top_size_x" value="0.3937" />
+    <property name="top_size_y" value="0.3556" />
+    <property name="top_size_z" value="0.0020" />
+    
+    <property name="wheel_radius" value="0.0746" />
+    <property name="wheel_length" value="0.02" />
+    <property name="caster_wheel_offset_y" value="0.17" />
+    
+    <property name="caster_support_x" value="0.086" />
+    <property name="caster_support_z" value="0.1095" />
+
+    <macro name="erratic">
+        <!-- base_footprint is a fictitious link(frame) that is on the ground right below base_link origin,
+             navigation stack depends on this frame -->
+        <link name="base_footprint">
+            <inertial>
+                <mass value="0.0001" />
+                <origin xyz="0 0 0" />
+                <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+                         iyy="0.0001" iyz="0.0" 
+                         izz="0.0001" />
+            </inertial>
+
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.001 0.001 0.001" />
+                </geometry>
+                <material name="Green" />
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 ${base_size_z/2 + 0.051}" rpy="0 0 0" />
+                <geometry>
+                  <box size="0.001 0.001 0.001" />
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="base_footprint_joint" type="fixed">
+            <!-- NB: While you would think this would make it go up, it is oddly reversed.
+                 This moves the joint to 0,0,0 where we want it for rviz, etc. -->
+            <origin xyz="0 0 ${base_size_z/2 + 0.051}" rpy="0 0 0" />        
+            <parent link="base_footprint"/>
+            <child link="base_link" />
+        </joint>
+
+        <!-- Links and Joints (i.e., the robot) -->
+        <link name="base_link">
+            <inertial>
+                <mass value="20" />
+                <origin xyz="${-base_size_x/2} 0 ${-base_size_z/2}" />
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                         iyy="1.0" iyz="0.0" 
+                         izz="1.0" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${base_size_x} ${base_size_y} ${base_size_z}" />
+                </geometry>
+                <material name="Blue" />
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${base_size_x} ${base_size_y} ${base_size_z}" />
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="base_top_joint" type="fixed" >
+            <origin xyz="0 0 ${base_size_z/2 + top_size_z/2}" rpy="0 0 0" />   <!-- 0.051 -->
+            <parent link="base_link" />
+            <child link="base_top_link"/>
+        </joint>
+
+        <link name="base_top_link">
+            <inertial>
+                <mass value="1.0"/>
+                <origin xyz="-0.00125736 0.0 -0.0032368" />
+                <inertia ixx="0.00995424" ixy="0.0" ixz="0.00000413"
+                         iyy="0.01191941" iyz="0.0" izx="0.00000413"
+                         izz="0.02181097" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://erratic_description/meshes/erratic_top.stl"/>
+                </geometry>
+                <material name="Blue" />
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://erratic_description/meshes/erratic_top.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="base_caster_box_joint" type="fixed">
+            <origin xyz="-${base_size_x/2 + caster_support_x/2} 0 ${base_size_z/2 - caster_support_z/2}" rpy="0 0 0" />
+            <parent link="base_link" />
+            <child link="base_caster_box_link"/>
+        </joint>
+
+        <link name="base_caster_box_link">
+            <inertial>
+                <mass value="0.1"/>
+                <origin xyz="0 0 0" />
+                <inertia ixx="0.01" ixy="0.0" ixz="0.0"
+                         iyy="0.01" iyz="0.0"
+                         izz="0.01" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${caster_support_x} 0.02 ${caster_support_z}" />
+                </geometry>
+                <material name="Blue" />
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${caster_support_x} 0.02 ${caster_support_z}" />
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="base_caster_support_joint" type="continuous">
+            <origin xyz="${-caster_support_x/2 + 0.015} 0 ${-caster_support_z/2 - 0.0315}" rpy="0 0 0" />
+            <parent link="base_caster_box_link" />
+            <child link="base_caster_support_link"/>
+            
+            <axis xyz="0 0 1" />
+            <anchor xyz="0.01 0 0" />
+            <limit effort="100" velocity="100" k_velocity="0" />
+            <joint_properties damping="0.0" friction="0.0" />
+        </joint>
+
+        <transmission type="pr2_mechanism_model/SimpleTransmission" name="base_caster_support_trans">
+            <actuator name="base_caster_support_motor" />
+            <joint name="base_caster_support_joint" />
+            <mechanicalReduction>1.0</mechanicalReduction>
+        </transmission>
+
+        <link name="base_caster_support_link">
+            <inertial>
+                <mass value="0.1"/>
+                <origin xyz="0 0 0" />
+                <inertia ixx="0.01" ixy="0.0" ixz="0.0"
+                         iyy="0.01" iyz="0.0"
+                         izz="0.01" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.03 0.02 0.063" />
+                </geometry>
+            </visual>
+            
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.03 0.02 0.063" />
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="caster_wheel_joint" type="continuous">
+            <origin xyz="-0.015 0 -0.03" rpy="0 0 0" />
+            <parent link="base_caster_support_link" />
+            <child link="caster_wheel_link" />      
+            
+            <axis xyz="0 1 0" />
+            <anchor xyz="0 0 0" />
+            <limit effort="100" velocity="100" k_velocity="0" />
+            <joint_properties damping="0.0" friction="0.0" />
+        </joint>
+
+        <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans">
+            <actuator name="caster_wheel_motor" />
+            <joint name="caster_wheel_joint" />
+            <mechanicalReduction>1.0</mechanicalReduction>
+        </transmission>
+
+        <link name="caster_wheel_link">
+            <inertial>
+                <mass value="0.1" /> 
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <inertia  ixx="0.012411765597" ixy="-0.000711733678" ixz="0.00050272983"
+                          iyy="0.015218160428" iyz="-0.000004273467"
+                          izz="0.011763977943" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder radius="0.035" length="0.01" />
+                </geometry>
+                <material name="Black"/>
+            </visual>
+            
+            <collision>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="0.035" length="0.01" />
+            </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="caster_wheel_link">
+            <mu1 value="100.0" />
+            <mu2 value="100.0" />
+            <kp  value="1000000.0" />
+            <kd  value="1.0" />
+        </gazebo>
+
+        <!-- MACRO INSTANTIATION -->
+
+        <erratic_computer parent="base_top_link"/>
+        <erratic_wheel suffix="left" parent="base_link" reflect="1"/>
+        <erratic_wheel suffix="right" parent="base_link" reflect="-1"/>
+
+        <!-- CONTROLLERS -->
+
+        <gazebo>
+            <controller:diffdrive_plugin name="differential_drive_controller" plugin="libdiffdrive_plugin.so">
+                <alwaysOn>true</alwaysOn>
+                <update>100</update>
+                <updateRate>100.0</updateRate>
+                <leftJoint>base_link_right_wheel_joint</leftJoint>
+                <rightJoint>base_link_left_wheel_joint</rightJoint>
+                <wheelSeparation>${caster_wheel_offset_y*2}</wheelSeparation>
+                <wheelDiameter>${wheel_radius*2}</wheelDiameter>
+                <torque>5</torque>
+                <interface:position name="position_iface_0"/>
+                <robotNamespace>/</robotNamespace>
+                <topicName>cmd_vel</topicName>
+            </controller:diffdrive_plugin>
+
+            <controller:gazebo_ros_p3d name="p3d_base_controller" plugin="libgazebo_ros_p3d.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>100.0</updateRate>
+                <bodyName>base_link</bodyName>
+                <topicName>base_pose_ground_truth</topicName>
+                <gaussianNoise>0.01</gaussianNoise>
+                <frameName>map</frameName>
+                <xyzOffsets>0 0 0</xyzOffsets> 
+                <rpyOffsets>0 0 0</rpyOffsets>
+                <interface:position name="p3d_base_position"/>
+            </controller:gazebo_ros_p3d>
+
+            <canonicalBody>base_footprint</canonicalBody>
+
+            <!-- this publishes empty joint_states due to no transmission, but
+             triggering robot_state_publisher to publish tf between fixed joints in erratic,
+             (e.g. base_laser_link for the base_scan frame) -->
+            <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>100.0</updateRate>
+                <interface:audio name="gazebo_ros_controller_manager_dummy_iface" />
+            </controller:gazebo_ros_controller_manager>
+        </gazebo>
+
+        <!-- GAZEBO MATERIALS -->
+
+        <gazebo reference="base_link">
+            <material>Erratic/BlueBrushedAluminum</material>
+        </gazebo>
+        
+        <gazebo reference="base_top_link">
+            <material>Erratic/BlueBrushedAluminum</material>
+        </gazebo>
+        
+        <gazebo reference="caster_wheel_link">
+            <material>Erratic/Black</material>
+        </gazebo>
+        
+        <gazebo reference="base_caster_box_link">
+            <material>Erratic/Black</material>
+        </gazebo>
+        
+        <gazebo reference="base_caster_support_link">
+            <material>Erratic/White</material>
+        </gazebo>
+    </macro>
+</robot>

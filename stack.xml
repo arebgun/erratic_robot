@@ -1,0 +1,20 @@
+<stack>
+    <description brief="erratic_robot">erratic_robot</description>
+
+    <author>Maintained by Antons Rebguns</author>
+    <license>BSD</license>  
+    <review status="unreviewed" notes=""/>
+    <url>http://ros.org/wiki/erratic_robot</url>
+
+    <depend stack="ros" />
+    <depend stack="robot_model" />
+    <depend stack="common" />
+    <depend stack="simulator_gazebo" />
+    <depend stack="navigation" />
+    <depend stack="laser_pipeline" />
+    <depend stack="motion_planning_common" />
+    <depend stack="slam_gmapping" />
+    <depend stack="geometry" />
+    <depend stack="common_msgs" />
+    <depend stack="pr2_common" />
+</stack>

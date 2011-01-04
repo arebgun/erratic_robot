@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find erratic_description)/launch/erratic_laser_wg_world.launch" />
+    <include file="$(find erratic_navigation_apps)/launch/erratic_2dnav_slam.launch" />
+</launch>

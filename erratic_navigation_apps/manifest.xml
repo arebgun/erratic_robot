@@ -1,0 +1,17 @@
+<package>
+    <description brief="erratic_navigation_apps">
+        erratic_navigation_apps
+    </description>
+
+    <author>Antons Rebguns</author>
+    <license>BSD</license>
+    <review status="unreviewed" notes=""/>
+    <url>http://ros.org/wiki/erratic_navigation_apps</url>
+
+    <depend package="map_server" />
+    <depend package="costmap_2d" />
+    <depend package="erratic_navigation"/>
+    <depend package="erratic_description" />
+</package>
+
+

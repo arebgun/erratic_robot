@@ -1,0 +1,10 @@
+<launch>
+    <node name="erratic_base_driver" pkg="erratic_player" type="erratic_player" output="screen" >
+        <remap from="odom" to="odom"/>
+        <remap from="battery_state" to="battery_state"/>
+        <param name="port_name" type="str" value="/dev/erratic"/>
+        <param name="enable_ir" type="bool" value="False"/>
+        <param name="odometry_frame_id" type="str" value="odom"/>
+    </node>
+</launch>
+
