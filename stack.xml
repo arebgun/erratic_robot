@@ -16,5 +16,4 @@
     <depend stack="slam_gmapping" />
     <depend stack="geometry" />
     <depend stack="common_msgs" />
-    <depend stack="pr2_common" />
 </stack>
