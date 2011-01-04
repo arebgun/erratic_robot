@@ -1,0 +1,14 @@
+<launch>
+    <node name="erratic_base_driver" pkg="erratic_player" type="erratic_player" output="screen" >
+        <remap from="odom" to="odom"/>
+        <remap from="battery_state" to="battery_state"/>
+        <param name="port_name" type="str" value="/dev/ttyUSB0"/>
+        <param name="enable_ir" type="bool" value="True"/>
+        <param name="enable_sonar" type="bool" value="True"/>
+        <param name="enable_vision_pan_tilt" type="bool" value="True"/>
+        <param name="enable_ranger_tilt" type="bool" value="True"/>
+        
+        <param name="odometry_frame_id" type="str" value="odom"/>
+    </node>
+</launch>
+

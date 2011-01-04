@@ -2,17 +2,16 @@
     <description brief="Videre Erratic mobile base ROS driver.">
         A ROS node that wraps up the Player erratic driver, which provides access to the Erratic mobile robot.
     </description>
-    <author>Brian P. Gerkey, Antons Rebguns</author>
+    <author>Maintained by Antons Rebguns</author>
     <license>BSD</license>
     <review status="unreviewed" notes=""/>
-    <url>http://ros.org/wiki/ua_erratic_player</url>
+    <url>http://ros.org/wiki/erratic_player</url>
     <depend package="roscpp"/>
-    <depend package="player"/>
-    <depend package="std_msgs"/>
     <depend package="tf"/>
+    <depend package="player"/>
     <depend package="geometry_msgs"/>
     <depend package="nav_msgs"/>
-    <depend package="pr2_msgs"/>
+    <depend package="std_msgs"/>
 </package>
 
 
