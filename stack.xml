@@ -1,5 +1,10 @@
 <stack>
-    <description brief="erratic_robot">erratic_robot</description>
+    <description brief="Packages related to Videre Erratic mobile robot">
+        This stack contains packages that are used to interface with Videre
+        Erratic mobile robot. These include the hardware interface driver,
+        URDF description, 3D meshes, navigation stack configuration and
+        launch files and keyboard teleoperation node.
+    </description>
 
     <author>Maintained by Antons Rebguns</author>
     <license>BSD</license>  
