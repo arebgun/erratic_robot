@@ -1,6 +1,7 @@
 <package>
-    <description brief="erratic_navigation">
-        erratic_navigation
+    <description brief="Navigation stack configuration for Erratic robot">
+        This package contains configuration and launch files necessary to run
+        ROS navigation stack on the Erratic robot.
     </description>
 
     <author>Antons Rebguns</author>

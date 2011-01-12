@@ -1,16 +1,16 @@
 <package>
-  <description brief="erratic_teleop">
+    <description brief="Teleoperation for Erratic robot">
+        This package contains keyboard teleoperation node used to drive the
+        Erratic robot.
+    </description>
 
-     erratic_teleop
+    <author>Antons Rebguns</author>
+    <license>BSD</license>
+    <review status="unreviewed" notes=""/>
+    <url>http://ros.org/wiki/erratic_teleop</url>
 
-  </description>
-  <author>Antons Rebguns</author>
-  <license>BSD</license>
-  <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/erratic_teleop</url>
-  <depend package="roscpp"/>
-  <depend package="geometry_msgs"/>
-
+    <depend package="roscpp"/>
+    <depend package="geometry_msgs"/>
 </package>
 
 
