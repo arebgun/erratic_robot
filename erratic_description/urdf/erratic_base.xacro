@@ -77,7 +77,7 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <box size="${base_size_x} ${base_size_y} ${base_size_z}" />
+                    <mesh filename="package://erratic_description/meshes/collada/base_link.dae"/>
                 </geometry>
                 <material name="Blue" />
             </visual>
@@ -85,7 +85,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <box size="${base_size_x} ${base_size_y} ${base_size_z}" />
+                    <mesh filename="package://erratic_description/meshes/collada/base_link.dae"/>
                 </geometry>
             </collision>
         </link>
@@ -108,7 +108,7 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/erratic_top.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_top.dae"/>
                 </geometry>
                 <material name="Blue" />
             </visual>
@@ -116,45 +116,14 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/erratic_top.stl"/>
-                </geometry>
-            </collision>
-        </link>
-
-        <joint name="base_caster_box_joint" type="fixed">
-            <origin xyz="-${base_size_x/2 + caster_support_x/2} 0 ${base_size_z/2 - caster_support_z/2}" rpy="0 0 0" />
-            <parent link="base_link" />
-            <child link="base_caster_box_link"/>
-        </joint>
-
-        <link name="base_caster_box_link">
-            <inertial>
-                <mass value="0.1"/>
-                <origin xyz="0 0 0" />
-                <inertia ixx="0.01" ixy="0.0" ixz="0.0"
-                         iyy="0.01" iyz="0.0"
-                         izz="0.01" />
-            </inertial>
-            
-            <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-                <geometry>
-                    <box size="${caster_support_x} 0.02 ${caster_support_z}" />
-                </geometry>
-                <material name="Blue" />
-            </visual>
-            
-            <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-                <geometry>
-                    <box size="${caster_support_x} 0.02 ${caster_support_z}" />
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_top.dae"/>
                 </geometry>
             </collision>
         </link>
 
         <joint name="base_caster_support_joint" type="continuous">
-            <origin xyz="${-caster_support_x/2 + 0.015} 0 ${-caster_support_z/2 - 0.0315}" rpy="0 0 0" />
-            <parent link="base_caster_box_link" />
+            <origin xyz="${-0.194 + 0.015} 0 ${-0.032 - 0.0315}" rpy="0 0 0" />
+            <parent link="base_link" />
             <child link="base_caster_support_link"/>
             
             <axis xyz="0 0 1" />
@@ -181,14 +150,14 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <box size="0.03 0.02 0.063" />
+                    <mesh filename="package://erratic_description/meshes/collada/caster_support.dae"/>
                 </geometry>
             </visual>
             
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <box size="0.03 0.02 0.063" />
+                    <mesh filename="package://erratic_description/meshes/collada/caster_support.dae"/>
                 </geometry>
             </collision>
         </link>
@@ -196,7 +165,7 @@
         <joint name="caster_wheel_joint" type="continuous">
             <origin xyz="-0.015 0 -0.03" rpy="0 0 0" />
             <parent link="base_caster_support_link" />
-            <child link="caster_wheel_link" />      
+            <child link="caster_wheel_link" />
             
             <axis xyz="0 1 0" />
             <anchor xyz="0 0 0" />
@@ -222,7 +191,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
                 <geometry>
-                    <cylinder radius="0.035" length="0.01" />
+                    <mesh filename="package://erratic_description/meshes/collada/caster_wheel.dae"/>
                 </geometry>
                 <material name="Black"/>
             </visual>
@@ -230,7 +199,7 @@
             <collision>
             <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
             <geometry>
-                <cylinder radius="0.035" length="0.01" />
+                <mesh filename="package://erratic_description/meshes/collada/caster_wheel.dae"/>
             </geometry>
             </collision>
         </link>

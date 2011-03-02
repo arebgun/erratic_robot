@@ -22,6 +22,7 @@
     <depend package="robot_state_publisher"/>
     <depend package="laser_filters"/>
     <depend package="robot_self_filter"/>
+    <depend package="pr2_gazebo_plugins"/>
 
     <export>
         <gazebo gazebo_media_path="${prefix}" />
