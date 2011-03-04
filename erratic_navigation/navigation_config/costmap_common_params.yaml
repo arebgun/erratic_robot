@@ -7,7 +7,7 @@ inflation_radius: 0.55
 observation_sources: base_scan base_scan_marking
 
 base_scan_marking: {sensor_frame: base_scan_link,
-                    data_type: PointCloud,
+                    data_type: PointCloud2,
                     topic: /base_scan/marking,
                     expected_update_rate: 0.2,
                     observation_persistence: 0.0,

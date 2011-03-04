@@ -22,4 +22,5 @@
     <depend stack="geometry" />
     <depend stack="common_msgs" />
     <depend stack="pr2_simulator" />
+    <depend stack="point_cloud_perception" />
 </stack>

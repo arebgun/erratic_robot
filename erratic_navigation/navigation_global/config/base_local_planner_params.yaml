@@ -7,7 +7,7 @@ TrajectoryPlannerROS:
     min_vel_x: 0.05
     max_rotational_vel: 1.0
     min_in_place_rotational_vel: 0.4
-    backup_vel: -0.1
+    escape_vel: -0.1
     holonomic_robot: false
 
     # Goal Tolerance Parameters

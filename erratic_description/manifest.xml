@@ -23,6 +23,7 @@
     <depend package="laser_filters"/>
     <depend package="robot_self_filter"/>
     <depend package="pr2_gazebo_plugins"/>
+    <depend package="point_cloud_converter"/>
 
     <export>
         <gazebo gazebo_media_path="${prefix}" />

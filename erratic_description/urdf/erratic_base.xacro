@@ -85,7 +85,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/base_link.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/base_link.dae"/>
                 </geometry>
             </collision>
         </link>
@@ -116,7 +116,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/erratic_top.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_top.dae"/>
                 </geometry>
             </collision>
         </link>
@@ -157,7 +157,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/caster_support.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/caster_support.dae"/>
                 </geometry>
             </collision>
         </link>
@@ -199,7 +199,7 @@
             <collision>
             <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
             <geometry>
-                <mesh filename="package://erratic_description/meshes/caster_wheel.stl"/>
+                <mesh filename="package://erratic_description/meshes/collada/caster_wheel.dae"/>
             </geometry>
             </collision>
         </link>
