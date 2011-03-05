@@ -12,6 +12,7 @@
     <url>http://ros.org/wiki/erratic_robot</url>
 
     <depend stack="ros" />
+    <depend stack="ros_comm" />
     <depend stack="robot_model" />
     <depend stack="common" />
     <depend stack="simulator_gazebo" />
