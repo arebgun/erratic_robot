@@ -138,6 +138,11 @@ public:
     ros::Subscriber cmd_vision_tilt_sub_;
     ros::Subscriber cmd_vision_pan_sub_;
     std::string tf_prefix_;
+    
+    bool publish_tf_;
+    double sigma_x_;
+    double sigma_y_;
+    double sigma_theta_;
 
     ErraticNode() : watts_charging_(10), watts_unplugged_(-10), charging_threshold_(12.98)
     {
@@ -163,7 +168,12 @@ public:
         private_nh.param("enable_sonar", enable_sonar, false);
         private_nh.param("enable_vision_pan_tilt", enable_vision_pan_tilt, false);
         private_nh.param("enable_ranger_tilt", enable_ranger_tilt, false);
+        private_nh.param("publish_tf", publish_tf_, true);
         private_nh.param("odometry_frame_id", odom_frame_id, string("odom"));
+
+        private_nh.param<double>("x_stddev", sigma_x_, 0.006);
+        private_nh.param<double>("y_stddev", sigma_y_, 0.006);
+        private_nh.param<double>("rotation_stddev", sigma_theta_, 0.051);
 
         tf_prefix_ = tf::getPrefixParam(node_);
 
@@ -436,6 +446,20 @@ public:
                                  (void*) &cmd,sizeof(cmd), NULL);
     }
 
+    void populateCovariance(nav_msgs::Odometry &msg)
+    {
+        // nav_msgs::Odometry has a 6x6 covariance matrix
+        msg.pose.covariance[0] = pow(sigma_x_, 2);
+        msg.pose.covariance[7] = pow(sigma_y_, 2);
+        msg.pose.covariance[35] = pow(sigma_theta_, 2);
+
+        msg.pose.covariance[14] = DBL_MAX;
+        msg.pose.covariance[21] = DBL_MAX;
+        msg.pose.covariance[28] = DBL_MAX;
+
+        msg.twist.covariance = msg.pose.covariance;
+    }
+
     void doUpdate()
     {
         Message* msg = NULL;
@@ -478,16 +502,21 @@ public:
             odom.header.stamp.sec = (long long unsigned int) floor(hdr->timestamp);
             odom.header.stamp.nsec = (long long unsigned int) ((hdr->timestamp - floor(hdr->timestamp)) * 1000000000ULL);
 
+            populateCovariance(odom);
+
             // Publish the new data
             odom_pub_.publish(odom);
 
-            tf_.sendTransform(tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(pdata->pos.pa),
-                                                                 tf::Point(pdata->pos.px,
-                                                                           pdata->pos.py,
-                                                                           0.0)),
-                                                   ros::Time(odom.header.stamp.sec, odom.header.stamp.nsec),
-                                                   odom_frame_id,
-                                                   "base_footprint"));
+            if (publish_tf_)
+            {
+                tf_.sendTransform(tf::StampedTransform(tf::Transform(tf::createQuaternionFromYaw(pdata->pos.pa),
+                                                                     tf::Point(pdata->pos.px,
+                                                                               pdata->pos.py,
+                                                                               0.0)),
+                                                       ros::Time(odom.header.stamp.sec, odom.header.stamp.nsec),
+                                                       odom_frame_id,
+                                                       "base_footprint"));
+           }
 
             //printf("Published new odom: (%.3f,%.3f,%.3f)\n",
             //odom.pose.pose.position.x, odom.pose.pose.position.y, odom.pose.pose.position.th);
