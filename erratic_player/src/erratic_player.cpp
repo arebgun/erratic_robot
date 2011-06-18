@@ -68,7 +68,7 @@ Subscribes to (name/type):
 Publishes to (name / type):
 - @b "odom"/Odometry : odometry data from the robot.
 - @b "battery_state"/PowerState : battery data. Since the robot does not have any charge detector, it uses the empirical result that the robot is charging if V>12.98
-- @b "sensor_msgs/RangeArray": Sonar Data.
+- @b "erratic_player/RangeArray": Sonar Data.
 
 <hr>
 
@@ -104,16 +104,16 @@ Publishes to (name / type):
 #include <libplayerxdr/playerxdr.h>
 
 #include <ros/ros.h>
-#include "tf/transform_broadcaster.h"
+#include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
-#include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Range.h>
 #include <std_msgs/Float64.h>
 
 #include <erratic_player/BatteryState.h>
 #include <erratic_player/RangeArray.h>
-#include <erratic_player/Range.h>
 
 #define PLAYER_QUEUE_LEN 32
 
@@ -563,7 +563,7 @@ public:
                 rangerArray.ranges[i].field_of_view = 0.5236085;
                 rangerArray.ranges[i].max_range = 5;
                 rangerArray.ranges[i].min_range = 0;
-                rangerArray.ranges[i].radiation_type = erratic_player::Range::ULTRASOUND;
+                rangerArray.ranges[i].radiation_type = sensor_msgs::Range::ULTRASOUND;
             }
 
             sonar_pub.publish(rangerArray);
@@ -587,7 +587,7 @@ public:
                 rangerArray.ranges[i].header.frame_id = string("erratic_ir_");
                 rangerArray.ranges[i].header.frame_id += boost::lexical_cast<std::string>(i);
                 rangerArray.ranges[i].range = pdata->ranges[i];
-                rangerArray.ranges[i].radiation_type = erratic_player::Range::INFRARED;
+                rangerArray.ranges[i].radiation_type = sensor_msgs::Range::INFRARED;
             }
 
             ir_pub_.publish(rangerArray);
