@@ -1,1 +1,1 @@
-Range[] ranges
+sensor_msgs/Range[] ranges
