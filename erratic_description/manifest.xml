@@ -1,9 +1,8 @@
 <package>
     <description brief="URDF for Erratic mobile base">
-
-    URDF description files for the ERA-MOBI (Erratic) mobile robot base from Videre.
-
+        URDF description files for the ERA-MOBI (Erratic) mobile robot base from Videre.
     </description>
+
     <author>Maintained by Antons Rebguns</author>
     <license>BSD</license>
     <review status="unreviewed" notes=""/>
@@ -28,7 +27,6 @@
     <export>
         <gazebo gazebo_media_path="${prefix}" />
     </export>
-
 </package>
 
 

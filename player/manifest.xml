@@ -1,26 +1,27 @@
 <package>
-<description brief="Player">
+    <description brief="Player">
+        This package contains Player, from the Player Project
+        (http://playerstage.sf.net). This package does not modify Player in any
+        way; it simply provides a convenient way to download and compile the
+        headers and libraries in a way that can be managed by the ROS dependency
+        system.
+    </description>
 
-This package contains Player, from the Player Project
-(http://playerstage.sf.net). This package does not modify Player in any
-way; it simply provides a convenient way to download and compile the
-headers and libraries in a way that can be managed by the ROS dependency
-system.
+    <author>Brian Gerkey, with contributions from many others. See web page for a full credits llist.</author>
+    <license>LGPL</license>
+    <review status="3rdparty" notes=""/>
+    <url>http://playerstage.sf.net</url>
 
-</description>
-<author>Brian Gerkey, with contributions from many others. See web page for a full credits llist.</author>
-<license>LGPL</license>
-<review status="3rdparty" notes=""/>
-<url>http://playerstage.sf.net</url>
-<export>
-  <cpp lflags="-Wl,-rpath,${prefix}/player/lib -L${prefix}/player/lib -lplayercore -lplayerxdr -lplayerutils -lplayererror -lplayerdrivers" cflags="-I${prefix}/player/include/player-2.2"/>
-  <doxymaker external="http://playerstage.sourceforge.net/doc/Player-cvs/player"/>
-</export>
-<versioncontrol type="svn" url="https://playerstage.svn.sourceforge.net/svnroot/playerstage/code/player/trunk"/>
-<rosdep name="pkg-config"/>
-  <platform os="ubuntu" version="9.04"/>
-  <platform os="ubuntu" version="9.10"/>
-  <platform os="ubuntu" version="10.04"/>
+    <export>
+        <cpp lflags="-Wl,-rpath,${prefix}/player/lib -L${prefix}/player/lib -lplayercore -lplayerxdr -lplayerutils -lplayererror -lplayerdrivers" cflags="-I${prefix}/player/include/player-2.2"/>
+        <doxymaker external="http://playerstage.sourceforge.net/doc/Player-cvs/player"/>
+    </export>
+
+    <versioncontrol type="svn" url="https://playerstage.svn.sourceforge.net/svnroot/playerstage/code/player/trunk"/>
+    <rosdep name="pkg-config"/>
+    <platform os="ubuntu" version="9.04"/>
+    <platform os="ubuntu" version="9.10"/>
+    <platform os="ubuntu" version="10.04"/>
 </package>
 
 

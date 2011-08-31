@@ -18,7 +18,6 @@
     <depend stack="simulator_gazebo" />
     <depend stack="navigation" />
     <depend stack="laser_pipeline" />
-    <depend stack="motion_planning_common" />
     <depend stack="slam_gmapping" />
     <depend stack="geometry" />
     <depend stack="common_msgs" />
