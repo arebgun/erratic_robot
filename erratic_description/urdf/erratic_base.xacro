@@ -10,23 +10,9 @@
     <include filename="$(find erratic_description)/urdf/erratic_computer.xacro" />
     <include filename="$(find erratic_description)/urdf/erratic_wheel.xacro" />
 
-    <!-- Properties (Constants) -->
-    <property name="M_PI" value="3.14159"/>
-    
-    <property name="base_size_x" value="0.217" />
-    <property name="base_size_y" value="0.280" />
-    <property name="base_size_z" value="0.155" />
-    
-    <property name="top_size_x" value="0.3937" />
-    <property name="top_size_y" value="0.3556" />
-    <property name="top_size_z" value="0.0020" />
-    
-    <property name="wheel_radius" value="0.0746" />
-    <property name="wheel_length" value="0.02" />
-    <property name="caster_wheel_offset_y" value="0.17" />
-    
-    <property name="caster_support_x" value="0.086" />
-    <property name="caster_support_z" value="0.1095" />
+    <property name="base_link_to_top" value="0.0795" />
+    <property name="base_link_to_front" value="0.2025" />
+    <property name="base_link_to_back" value="0.1975" />
 
     <macro name="erratic">
         <!-- base_footprint is a fictitious link(frame) that is on the ground right below base_link origin,
@@ -39,7 +25,7 @@
                          iyy="0.0001" iyz="0.0" 
                          izz="0.0001" />
             </inertial>
-
+            
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
@@ -47,9 +33,9 @@
                 </geometry>
                 <material name="Green" />
             </visual>
-
+            
             <collision>
-                <origin xyz="0 0 ${base_size_z/2 + 0.051}" rpy="0 0 0" />
+                <origin xyz="0 0 0.128" rpy="0 0 0" />
                 <geometry>
                   <box size="0.001 0.001 0.001" />
                 </geometry>
@@ -57,9 +43,7 @@
         </link>
 
         <joint name="base_footprint_joint" type="fixed">
-            <!-- NB: While you would think this would make it go up, it is oddly reversed.
-                 This moves the joint to 0,0,0 where we want it for rviz, etc. -->
-            <origin xyz="0 0 ${base_size_z/2 + 0.051}" rpy="0 0 0" />        
+            <origin xyz="0 0 0.128" rpy="0 0 0" />
             <parent link="base_footprint"/>
             <child link="base_link" />
         </joint>
@@ -68,61 +52,30 @@
         <link name="base_link">
             <inertial>
                 <mass value="20" />
-                <origin xyz="${-base_size_x/2} 0 ${-base_size_z/2}" />
+                <origin xyz="0 0 0" />
                 <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                          iyy="1.0" iyz="0.0" 
                          izz="1.0" />
             </inertial>
             
             <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/base_link.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_base_link.dae"/>
                 </geometry>
                 <material name="Blue" />
             </visual>
             
             <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/collada/base_link.dae"/>
-                </geometry>
-            </collision>
-        </link>
-
-        <joint name="base_top_joint" type="fixed" >
-            <origin xyz="0 0 ${base_size_z/2 + top_size_z/2}" rpy="0 0 0" />   <!-- 0.051 -->
-            <parent link="base_link" />
-            <child link="base_top_link"/>
-        </joint>
-
-        <link name="base_top_link">
-            <inertial>
-                <mass value="1.0"/>
-                <origin xyz="-0.00125736 0.0 -0.0032368" />
-                <inertia ixx="0.00995424" ixy="0.0" ixz="0.00000413"
-                         iyy="0.01191941" iyz="0.0" izx="0.00000413"
-                         izz="0.02181097" />
-            </inertial>
-            
-            <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-                <geometry>
-                    <mesh filename="package://erratic_description/meshes/erratic_top.stl"/>
-                </geometry>
-                <material name="Blue" />
-            </visual>
-            
-            <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-                <geometry>
-                    <mesh filename="package://erratic_description/meshes/collada/erratic_top.dae"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_base_link.dae"/>
                 </geometry>
             </collision>
         </link>
 
         <joint name="base_caster_support_joint" type="continuous">
-            <origin xyz="${-0.194 + 0.015} 0 ${-0.032 - 0.0315}" rpy="0 0 0" />
+            <origin xyz="-0.188 0 -0.043" rpy="0 0 0" />
             <parent link="base_link" />
             <child link="base_caster_support_link"/>
             
@@ -148,22 +101,22 @@
             </inertial>
             
             <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/caster_support.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_caster_support_link.dae"/>
                 </geometry>
             </visual>
             
             <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/collada/caster_support.dae"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_caster_support_link.dae"/>
                 </geometry>
             </collision>
         </link>
 
         <joint name="caster_wheel_joint" type="continuous">
-            <origin xyz="-0.015 0 -0.03" rpy="0 0 0" />
+            <origin xyz="-0.025 0 -0.0469" rpy="0 0 0" />
             <parent link="base_caster_support_link" />
             <child link="caster_wheel_link" />
             
@@ -182,25 +135,25 @@
         <link name="caster_wheel_link">
             <inertial>
                 <mass value="0.1" /> 
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <inertia  ixx="0.012411765597" ixy="-0.000711733678" ixz="0.00050272983"
                           iyy="0.015218160428" iyz="-0.000004273467"
                           izz="0.011763977943" />
             </inertial>
             
             <visual>
-                <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/caster_wheel.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_caster_wheel_link.dae"/>
                 </geometry>
                 <material name="Black"/>
             </visual>
             
             <collision>
-            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
-            <geometry>
-                <mesh filename="package://erratic_description/meshes/collada/caster_wheel.dae"/>
-            </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_caster_wheel_link.dae"/>
+                </geometry>
             </collision>
         </link>
 
@@ -211,11 +164,21 @@
             <kd  value="1.0" />
         </gazebo>
 
+
         <!-- MACRO INSTANTIATION -->
 
-        <erratic_computer parent="base_top_link"/>
-        <erratic_wheel suffix="left" parent="base_link" reflect="1"/>
-        <erratic_wheel suffix="right" parent="base_link" reflect="-1"/>
+        <erratic_computer parent="base_link">
+            <origin xyz="${-base_link_to_back + computer_size_x/2 + 0.02} 0 ${base_link_to_top}" rpy="0 0 0" />
+        </erratic_computer>
+        
+        <erratic_wheel suffix="left" parent="base_link">
+            <origin xyz="0.075 0.16525 -0.053" rpy="0 0 0" />
+        </erratic_wheel>
+        
+        <erratic_wheel suffix="right" parent="base_link">
+            <origin xyz="0.075 -0.16525 -0.053" rpy="0 0 0" />
+        </erratic_wheel>
+
 
         <!-- CONTROLLERS -->
 
@@ -226,8 +189,8 @@
                 <updateRate>100.0</updateRate>
                 <leftJoint>base_link_right_wheel_joint</leftJoint>
                 <rightJoint>base_link_left_wheel_joint</rightJoint>
-                <wheelSeparation>${caster_wheel_offset_y*2}</wheelSeparation>
-                <wheelDiameter>${wheel_radius*2}</wheelDiameter>
+                <wheelSeparation>0.3305</wheelSeparation>
+                <wheelDiameter>0.15</wheelDiameter>
                 <torque>5</torque>
                 <interface:position name="position_iface_0"/>
                 <robotNamespace>/</robotNamespace>

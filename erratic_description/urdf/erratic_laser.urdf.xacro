@@ -12,7 +12,7 @@
     <erratic />
 
     <!-- BASE LASER ATTACHMENT -->
-    <erratic_hokuyo_laser parent="base_top_link">
-        <origin xyz="${top_size_x/2 - 0.01 - 0.04} 0 ${top_size_z/2}" rpy="0 0 0" />
+    <erratic_hokuyo_laser parent="base_link">
+        <origin xyz="${base_link_to_front - 0.01 - 0.04} 0 ${base_link_to_top}" rpy="0 0 0" />
     </erratic_hokuyo_laser>
 </robot>

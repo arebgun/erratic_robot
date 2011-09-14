@@ -5,14 +5,9 @@
     xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
     xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
     
-    <!-- Properties (Constants) -->
-    <property name="M_PI" value="3.14159"/>
-    
-    <property name="wheel_offset_z" value="${-base_size_z/2 + 0.0236}" />
-    
-    <macro name="erratic_wheel" params="suffix parent reflect">
+    <macro name="erratic_wheel" params="suffix parent *origin">
         <joint name="${parent}_${suffix}_wheel_joint" type="continuous">
-            <origin xyz="0.075 ${reflect*0.165} -0.0539" rpy="0 0 0" />
+            <insert_block name="origin" />
             <axis xyz="0 1 0" />
             <anchor xyz="0 0 0" />
             <limit effort="100" velocity="100" />
@@ -31,17 +26,17 @@
             </inertial>
             
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/erratic_wheel.stl"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_front_wheel_link.dae"/>
                 </geometry>
                 <material name="Black" />
             </visual>
             
             <collision>
-                <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://erratic_description/meshes/collada/erratic_wheel.dae"/>
+                    <mesh filename="package://erratic_description/meshes/collada/erratic_front_wheel_link.dae"/>
                 </geometry>
             </collision>
         </link>

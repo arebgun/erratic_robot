@@ -9,9 +9,9 @@
     <property name="computer_size_y" value="0.175" />
     <property name="computer_size_z" value="0.056" />
     
-    <macro name="erratic_computer" params="parent">
+    <macro name="erratic_computer" params="parent *origin">
         <joint name="computer_mount_joint" type="fixed">
-            <origin xyz="-${top_size_x/2 - 0.0254 - computer_size_y/2} ${top_size_y/2 - 0.1 - computer_size_y/2} ${top_size_z/2}" />
+            <insert_block name="origin" />
             <parent link="${parent}" />
             <child link="computer_link" />
         </joint>
