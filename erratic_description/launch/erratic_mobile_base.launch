@@ -15,7 +15,6 @@
     <!-- start robot state publisher -->
     <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" output="screen" >
         <param name="publish_frequency" type="double" value="50.0" />
-        <param name="tf_prefix" type="string" value="" />
     </node>
 
 <!--    <node pkg="fake_localization" type="fake_localization" name="fake_localization" respawn="true" output="screen" >-->

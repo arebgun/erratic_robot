@@ -43,7 +43,7 @@
         </link>
 
         <joint name="base_footprint_joint" type="fixed">
-            <origin xyz="0 0 0.128" rpy="0 0 0" />
+            <origin xyz="0.063 0 0.128" rpy="0 0 0" />
             <parent link="base_footprint"/>
             <child link="base_link" />
         </joint>
@@ -193,7 +193,6 @@
                 <wheelDiameter>0.15</wheelDiameter>
                 <torque>5</torque>
                 <interface:position name="position_iface_0"/>
-                <robotNamespace>/</robotNamespace>
                 <topicName>cmd_vel</topicName>
             </controller:diffdrive_plugin>
 
