@@ -133,7 +133,8 @@ void DiffDrivePlugin::LoadChild(XMLConfigNode *node)
   char** argv = NULL;
   ros::init(argc, argv, "diff_drive_plugin", ros::init_options::NoSigintHandler | ros::init_options::AnonymousName);
   rosnode_ = new ros::NodeHandle(robotNamespace);
-
+  ROS_INFO("starting diffdrive plugin in ns: %s", this->robotNamespace.c_str());
+  
   tf_prefix_ = tf::getPrefixParam(*rosnode_);
   transform_broadcaster_ = new tf::TransformBroadcaster();
 
@@ -303,30 +304,36 @@ void DiffDrivePlugin::QueueThread()
   }
 }
 
-// NEW: Update this to publish odometry topic
 void DiffDrivePlugin::publish_odometry()
 {
-  // get current time
-  ros::Time current_time_((Simulator::Instance()->GetSimTime()).sec, (Simulator::Instance()->GetSimTime()).nsec); 
-
+  ros::Time current_time = ros::Time::now();
+  std::string odom_frame = tf::resolve(tf_prefix_, "odom");
+  std::string base_footprint_frame = tf::resolve(tf_prefix_, "base_footprint");
+  
   // getting data for base_footprint to odom transform
   btQuaternion qt;
-  // TODO: Is there something wrong here? RVIZ has a problem?
-  qt.setEulerZYX(pos_iface_->data->pose.yaw, pos_iface_->data->pose.pitch, pos_iface_->data->pose.roll);
-  btVector3 vt(pos_iface_->data->pose.pos.x, pos_iface_->data->pose.pos.y, pos_iface_->data->pose.pos.z);
+  qt.setRPY(pos_iface_->data->pose.roll,
+            pos_iface_->data->pose.pitch,
+            pos_iface_->data->pose.yaw);
+  
+  btVector3 vt(pos_iface_->data->pose.pos.x,
+               pos_iface_->data->pose.pos.y,
+               pos_iface_->data->pose.pos.z);
+  
   tf::Transform base_footprint_to_odom(qt, vt);
-
   transform_broadcaster_->sendTransform(tf::StampedTransform(base_footprint_to_odom,
-                                                            current_time_,
-                                                            "odom",
-                                                            "base_footprint"));
+                                                             current_time,
+                                                             odom_frame,
+                                                             base_footprint_frame));
 
   // publish odom topic
   odom_.pose.pose.position.x = pos_iface_->data->pose.pos.x;
   odom_.pose.pose.position.y = pos_iface_->data->pose.pos.y;
 
   gazebo::Quatern rot;
-  rot.SetFromEuler(gazebo::Vector3(pos_iface_->data->pose.roll, pos_iface_->data->pose.pitch, pos_iface_->data->pose.yaw));
+  rot.SetFromEuler(gazebo::Vector3(pos_iface_->data->pose.roll,
+                                   pos_iface_->data->pose.pitch,
+                                   pos_iface_->data->pose.yaw));
 
   odom_.pose.pose.orientation.x = rot.x;
   odom_.pose.pose.orientation.y = rot.y;
@@ -337,12 +344,9 @@ void DiffDrivePlugin::publish_odometry()
   odom_.twist.twist.linear.y = pos_iface_->data->velocity.pos.y;
   odom_.twist.twist.angular.z = pos_iface_->data->velocity.yaw;
 
-  odom_.header.frame_id = tf::resolve(tf_prefix_, "odom");
-  odom_.child_frame_id = "base_footprint";
-
-  //odom_.header.stamp = current_time_;
-  odom_.header.stamp.sec = (Simulator::Instance()->GetSimTime()).sec;
-  odom_.header.stamp.nsec = (Simulator::Instance()->GetSimTime()).nsec;
+  odom_.header.stamp = current_time;
+  odom_.header.frame_id = odom_frame;
+  odom_.child_frame_id = base_footprint_frame;
 
   pub_.publish(odom_);
 }
