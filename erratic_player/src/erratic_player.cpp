@@ -448,15 +448,27 @@ public:
 
     void populateCovariance(nav_msgs::Odometry &msg)
     {
-        // nav_msgs::Odometry has a 6x6 covariance matrix
-        msg.pose.covariance[0] = pow(sigma_x_, 2);
-        msg.pose.covariance[7] = pow(sigma_y_, 2);
-        msg.pose.covariance[35] = pow(sigma_theta_, 2);
-
+        if (fabs(msg.twist.twist.linear.x) <= 1e-8 &&
+            fabs(msg.twist.twist.linear.y) <= 1e-8 &&
+            fabs(msg.twist.twist.linear.z) <= 1e-8)
+        {
+            //nav_msgs::Odometry has a 6x6 covariance matrix
+            msg.pose.covariance[0] = 1e-12;
+            msg.pose.covariance[7] = 1e-12;
+            msg.pose.covariance[35] = 1e-12;
+        }
+        else
+        {
+            // nav_msgs::Odometry has a 6x6 covariance matrix
+            msg.pose.covariance[0] = pow(sigma_x_, 2);
+            msg.pose.covariance[7] = pow(sigma_y_, 2);
+            msg.pose.covariance[35] = pow(sigma_theta_, 2);
+        }
+        
         msg.pose.covariance[14] = DBL_MAX;
         msg.pose.covariance[21] = DBL_MAX;
         msg.pose.covariance[28] = DBL_MAX;
-
+        
         msg.twist.covariance = msg.pose.covariance;
     }
 
