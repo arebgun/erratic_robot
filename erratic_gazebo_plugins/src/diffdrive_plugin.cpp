@@ -1,44 +1,47 @@
 /*
- *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
- *     Nate Koenig & Andrew Howard
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- */
-/*
- * Desc: ROS interface to a Position2d controller for a Differential drive.
- * Author: Daniel Hewlett (adapted from Nathan Koenig)
- */
+    Copyright (c) 2010, Daniel Hewlett, Antons Rebguns
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+        * Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+        * Neither the name of the <organization> nor the
+        names of its contributors may be used to endorse or promote products
+        derived from this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY Antons Rebguns <email> ''AS IS'' AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL Antons Rebguns <email> BE LIABLE FOR ANY
+    DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 
 #include <algorithm>
 #include <assert.h>
 
 #include <erratic_gazebo_plugins/diffdrive_plugin.h>
 
-#include <gazebo/gazebo.h>
-#include <gazebo/GazeboError.hh>
-#include <gazebo/Quatern.hh>
-#include <gazebo/Controller.hh>
-#include <gazebo/Body.hh>
-#include <gazebo/World.hh>
-#include <gazebo/Simulator.hh>
-#include <gazebo/Global.hh>
-#include <gazebo/XMLConfig.hh>
-#include <gazebo/ControllerFactory.hh>
-#include <gazebo/PhysicsEngine.hh>
+#include <gazebo.h>
+#include <common/Exception.hh>
+#include <math/Quaternion.hh>
+#include <math/Pose.hh>
+#include <physics/Joint.hh>
+#include <physics/Physics.hh>
+#include <physics/PhysicsEngine.hh>
+#include <physics/PhysicsTypes.hh>
+#include <physics/World.hh>
+#include <sdf/interface/SDF.hh>
+#include <sdf/interface/Param.hh>
 
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
@@ -47,99 +50,126 @@
 #include <nav_msgs/Odometry.h>
 #include <boost/bind.hpp>
 
-using namespace gazebo;
-
-GZ_REGISTER_DYNAMIC_CONTROLLER("diffdrive_plugin", DiffDrivePlugin);
+namespace gazebo
+{
 
 enum
 {
-  RIGHT, LEFT
+  RIGHT,
+  LEFT,
 };
 
 // Constructor
-DiffDrivePlugin::DiffDrivePlugin(Entity *parent) :
-  Controller(parent)
+DiffDrivePlugin::DiffDrivePlugin()
 {
-  parent_ = dynamic_cast<Model*> (parent);
-
-  if (!parent_)
-    gzthrow("Differential_Position2d controller requires a Model as its parent");
-
-  enableMotors = true;
-
-  wheelSpeed[RIGHT] = 0;
-  wheelSpeed[LEFT] = 0;
-
-  prevUpdateTime = Simulator::Instance()->GetSimTime();
-
-  Param::Begin(&parameters);
-  leftJointNameP = new ParamT<std::string> ("leftJoint", "", 1);
-  rightJointNameP = new ParamT<std::string> ("rightJoint", "", 1);
-  wheelSepP = new ParamT<float> ("wheelSeparation", 0.34, 1);
-  wheelDiamP = new ParamT<float> ("wheelDiameter", 0.15, 1);
-  torqueP = new ParamT<float> ("torque", 10.0, 1);
-  robotNamespaceP = new ParamT<std::string> ("robotNamespace", "/", 0);
-  topicNameP = new ParamT<std::string> ("topicName", "", 1);
-  Param::End();
-
-  x_ = 0;
-  rot_ = 0;
-  alive_ = true;
 }
 
 // Destructor
 DiffDrivePlugin::~DiffDrivePlugin()
 {
-  delete leftJointNameP;
-  delete rightJointNameP;
-  delete wheelSepP;
-  delete wheelDiamP;
-  delete torqueP;
-  delete robotNamespaceP;
-  delete topicNameP;
-  delete callback_queue_thread_;
   delete rosnode_;
   delete transform_broadcaster_;
 }
 
 // Load the controller
-void DiffDrivePlugin::LoadChild(XMLConfigNode *node)
+void DiffDrivePlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
-  pos_iface_ = dynamic_cast<libgazebo::PositionIface*> (GetIface("position"));
+  this->parent = _parent;
+  this->world = _parent->GetWorld();
 
-  // the defaults are from pioneer2dx
-  wheelSepP->Load(node);
-  wheelDiamP->Load(node);
-  torqueP->Load(node);
+  gzdbg << "plugin parent sensor name: " << parent->GetName() << "\n";
 
-  leftJointNameP->Load(node);
-  rightJointNameP->Load(node);
+  if (!this->parent) { gzthrow("Differential_Position2d controller requires a Model as its parent"); }
 
-  joints[LEFT] = parent_->GetJoint(**leftJointNameP);
-  joints[RIGHT] = parent_->GetJoint(**rightJointNameP);
+  this->robotNamespace = "";
+  if (_sdf->HasElement("robotNamespace"))
+  {
+    this->robotNamespace = _sdf->GetElement("robotNamespace")->GetValueString() + "/";
+  }
 
-  if (!joints[LEFT])
-    gzthrow("The controller couldn't get left hinge joint");
+  if (!_sdf->HasElement("leftJoint"))
+  {
+    ROS_WARN("Differential Drive plugin missing <leftJoint>, defaults to left_joint");
+    this->leftJointName = "left_joint";
+  }
+  else
+  {
+    this->leftJointName = _sdf->GetElement("leftJoint")->GetValueString();
+  }
 
-  if (!joints[RIGHT])
-    gzthrow("The controller couldn't get right hinge joint");
+  if (!_sdf->HasElement("rightJoint"))
+  {
+    ROS_WARN("Differential Drive plugin missing <rightJoint>, defaults to right_joint");
+    this->rightJointName = "right_joint";
+  }
+  else
+  {
+    this->rightJointName = _sdf->GetElement("rightJoint")->GetValueString();
+  }
+
+  if (!_sdf->HasElement("wheelSeparation"))
+  {
+    ROS_WARN("Differential Drive plugin missing <wheelSeparation>, defaults to 0.34");
+    this->wheelSeparation = 0.34;
+  }
+  else
+  {
+    this->wheelSeparation = _sdf->GetElement("wheelSeparation")->GetValueDouble();
+  }
+
+  if (!_sdf->HasElement("wheelDiameter"))
+  {
+    ROS_WARN("Differential Drive plugin missing <wheelDiameter>, defaults to 0.15");
+    this->wheelDiameter = 0.15;
+  }
+  else
+  {
+    this->wheelDiameter = _sdf->GetElement("wheelDiameter")->GetValueDouble();
+  }
+
+  if (!_sdf->HasElement("torque"))
+  {
+    ROS_WARN("Differential Drive plugin missing <torque>, defaults to 5.0");
+    this->torque = 5.0;
+  }
+  else
+  {
+    this->torque = _sdf->GetElement("torque")->GetValueDouble();
+  }
+
+  if (!_sdf->HasElement("topicName"))
+  {
+    ROS_WARN("Differential Drive plugin missing <topicName>, defaults to cmd_vel");
+    this->topicName = "cmd_vel";
+  }
+  else
+  {
+    this->topicName = _sdf->GetElement("topicName")->GetValueString();
+  }
+
+  wheelSpeed[RIGHT] = 0;
+  wheelSpeed[LEFT] = 0;
+
+  x_ = 0;
+  rot_ = 0;
+  alive_ = true;
+
+  joints[LEFT] = this->parent->GetJoint(leftJointName);
+  joints[RIGHT] = this->parent->GetJoint(rightJointName);
+
+  if (!joints[LEFT])  { gzthrow("The controller couldn't get left hinge joint"); }
+  if (!joints[RIGHT]) { gzthrow("The controller couldn't get right hinge joint"); }
 
   // Initialize the ROS node and subscribe to cmd_vel
-
-  robotNamespaceP->Load(node);
-  robotNamespace = robotNamespaceP->GetValue();
-
   int argc = 0;
   char** argv = NULL;
   ros::init(argc, argv, "diff_drive_plugin", ros::init_options::NoSigintHandler | ros::init_options::AnonymousName);
-  rosnode_ = new ros::NodeHandle(robotNamespace);
+  rosnode_ = new ros::NodeHandle(this->robotNamespace);
+
   ROS_INFO("starting diffdrive plugin in ns: %s", this->robotNamespace.c_str());
-  
+
   tf_prefix_ = tf::getPrefixParam(*rosnode_);
   transform_broadcaster_ = new tf::TransformBroadcaster();
-
-  topicNameP->Load(node);
-  topicName = topicNameP->GetValue();
 
   // ROS: Subscribe to the velocity command topic (usually "cmd_vel")
   ros::SubscribeOptions so =
@@ -148,11 +178,8 @@ void DiffDrivePlugin::LoadChild(XMLConfigNode *node)
                                                           ros::VoidPtr(), &queue_);
   sub_ = rosnode_->subscribe(so);
   pub_ = rosnode_->advertise<nav_msgs::Odometry>("odom", 1);
-}
 
-// Initialize the controller
-void DiffDrivePlugin::InitChild()
-{
+  // Initialize the controller
   // Reset odometric pose
   odomPose[0] = 0.0;
   odomPose[1] = 0.0;
@@ -162,30 +189,11 @@ void DiffDrivePlugin::InitChild()
   odomVel[1] = 0.0;
   odomVel[2] = 0.0;
 
-  callback_queue_thread_ = new boost::thread(boost::bind(&DiffDrivePlugin::QueueThread, this));
-}
+  // start custom queue for diff drive
+  this->callback_queue_thread_ = boost::thread(boost::bind(&DiffDrivePlugin::QueueThread, this));
 
-// Load the controller
-void DiffDrivePlugin::SaveChild(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(leftJointNameP) << "\n";
-  stream << prefix << *(rightJointNameP) << "\n";
-  stream << prefix << *(torqueP) << "\n";
-  stream << prefix << *(wheelDiamP) << "\n";
-  stream << prefix << *(wheelSepP) << "\n";
-}
-
-// Reset
-void DiffDrivePlugin::ResetChild()
-{
-  // Reset odometric pose
-  odomPose[0] = 0.0;
-  odomPose[1] = 0.0;
-  odomPose[2] = 0.0;
-
-  odomVel[0] = 0.0;
-  odomVel[1] = 0.0;
-  odomVel[2] = 0.0;
+  // listen to the update event (broadcast every simulation iteration)
+  this->updateConnection = event::Events::ConnectWorldUpdateStart(boost::bind(&DiffDrivePlugin::UpdateChild, this));
 }
 
 // Update the controller
@@ -195,22 +203,16 @@ void DiffDrivePlugin::UpdateChild()
   double wd, ws;
   double d1, d2;
   double dr, da;
-  Time stepTime;
-
-  //myIface->Lock(1);
+  double stepTime = this->world->GetPhysicsEngine()->GetStepTime();
 
   GetPositionCmd();
 
-  wd = **(wheelDiamP);
-  ws = **(wheelSepP);
-
-  //stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  stepTime = Simulator::Instance()->GetSimTime() - prevUpdateTime;
-  prevUpdateTime = Simulator::Instance()->GetSimTime();
+  wd = wheelDiameter;
+  ws = wheelSeparation;
 
   // Distance travelled by front wheels
-  d1 = stepTime.Double() * wd / 2 * joints[LEFT]->GetVelocity(0);
-  d2 = stepTime.Double() * wd / 2 * joints[RIGHT]->GetVelocity(0);
+  d1 = stepTime * wd / 2 * joints[LEFT]->GetVelocity(0);
+  d2 = stepTime * wd / 2 * joints[RIGHT]->GetVelocity(0);
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / ws;
@@ -221,40 +223,30 @@ void DiffDrivePlugin::UpdateChild()
   odomPose[2] += da;
 
   // Compute odometric instantaneous velocity
-  odomVel[0] = dr / stepTime.Double();
+  odomVel[0] = dr / stepTime;
   odomVel[1] = 0.0;
-  odomVel[2] = da / stepTime.Double();
+  odomVel[2] = da / stepTime;
 
-  if (enableMotors)
-  {
-    joints[LEFT]->SetVelocity(0, wheelSpeed[LEFT] / (**(wheelDiamP) / 2.0));
+  joints[LEFT]->SetVelocity(0, wheelSpeed[LEFT] / (wheelDiameter / 2.0));
+  joints[RIGHT]->SetVelocity(0, wheelSpeed[RIGHT] / (wheelDiameter / 2.0));
 
-    joints[RIGHT]->SetVelocity(0, wheelSpeed[RIGHT] / (**(wheelDiamP) / 2.0));
-
-    joints[LEFT]->SetMaxForce(0, **(torqueP));
-    joints[RIGHT]->SetMaxForce(0, **(torqueP));
-  }
+  joints[LEFT]->SetMaxForce(0, torque);
+  joints[RIGHT]->SetMaxForce(0, torque);
 
   write_position_data();
   publish_odometry();
-
-  //myIface->Unlock();
 }
 
 // Finalize the controller
 void DiffDrivePlugin::FiniChild()
 {
-  //std::cout << "ENTERING FINALIZE\n";
   alive_ = false;
-  // Custom Callback Queue
   queue_.clear();
   queue_.disable();
   rosnode_->shutdown();
-  callback_queue_thread_->join();
-  //std::cout << "EXITING FINALIZE\n";
+  callback_queue_thread_.join();
 }
 
-// NEW: Now uses the target velocities from the ROS message, not the Iface 
 void DiffDrivePlugin::GetPositionCmd()
 {
   lock.lock();
@@ -266,40 +258,28 @@ void DiffDrivePlugin::GetPositionCmd()
 
   //std::cout << "X: [" << x_ << "] ROT: [" << rot_ << "]" << std::endl;
 
-  // Changed motors to be always on, which is probably what we want anyway
-  enableMotors = true; //myIface->data->cmdEnableMotors > 0;
-
-  //std::cout << enableMotors << std::endl;
-
-  wheelSpeed[LEFT] = vr + va * **(wheelSepP) / 2;
-  wheelSpeed[RIGHT] = vr - va * **(wheelSepP) / 2;
+  wheelSpeed[LEFT] = vr + va * wheelSeparation / 2.0;
+  wheelSpeed[RIGHT] = vr - va * wheelSeparation / 2.0;
 
   lock.unlock();
 }
 
-// NEW: Store the velocities from the ROS message
 void DiffDrivePlugin::cmdVelCallback(const geometry_msgs::Twist::ConstPtr& cmd_msg)
 {
-  //std::cout << "BEGIN CALLBACK\n";
-
   lock.lock();
 
   x_ = cmd_msg->linear.x;
   rot_ = cmd_msg->angular.z;
 
   lock.unlock();
-
-  //std::cout << "END CALLBACK\n";
 }
 
-// NEW: custom callback queue thread
 void DiffDrivePlugin::QueueThread()
 {
   static const double timeout = 0.01;
 
   while (alive_ && rosnode_->ok())
   {
-    //    std::cout << "CALLING STUFF\n";
     queue_.callAvailable(ros::WallDuration(timeout));
   }
 }
@@ -309,17 +289,13 @@ void DiffDrivePlugin::publish_odometry()
   ros::Time current_time = ros::Time::now();
   std::string odom_frame = tf::resolve(tf_prefix_, "odom");
   std::string base_footprint_frame = tf::resolve(tf_prefix_, "base_footprint");
-  
+
   // getting data for base_footprint to odom transform
-  btQuaternion qt;
-  qt.setRPY(pos_iface_->data->pose.roll,
-            pos_iface_->data->pose.pitch,
-            pos_iface_->data->pose.yaw);
-  
-  btVector3 vt(pos_iface_->data->pose.pos.x,
-               pos_iface_->data->pose.pos.y,
-               pos_iface_->data->pose.pos.z);
-  
+  math::Pose pose = this->parent->GetState().GetPose();
+
+  btQuaternion qt(pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w);
+  btVector3 vt(pose.pos.x, pose.pos.y, pose.pos.z);
+
   tf::Transform base_footprint_to_odom(qt, vt);
   transform_broadcaster_->sendTransform(tf::StampedTransform(base_footprint_to_odom,
                                                              current_time,
@@ -327,22 +303,18 @@ void DiffDrivePlugin::publish_odometry()
                                                              base_footprint_frame));
 
   // publish odom topic
-  odom_.pose.pose.position.x = pos_iface_->data->pose.pos.x;
-  odom_.pose.pose.position.y = pos_iface_->data->pose.pos.y;
+  odom_.pose.pose.position.x = pose.pos.x;
+  odom_.pose.pose.position.y = pose.pos.y;
 
-  gazebo::Quatern rot;
-  rot.SetFromEuler(gazebo::Vector3(pos_iface_->data->pose.roll,
-                                   pos_iface_->data->pose.pitch,
-                                   pos_iface_->data->pose.yaw));
+  odom_.pose.pose.orientation.x = pose.rot.x;
+  odom_.pose.pose.orientation.y = pose.rot.y;
+  odom_.pose.pose.orientation.z = pose.rot.z;
+  odom_.pose.pose.orientation.w = pose.rot.w;
 
-  odom_.pose.pose.orientation.x = rot.x;
-  odom_.pose.pose.orientation.y = rot.y;
-  odom_.pose.pose.orientation.z = rot.z;
-  odom_.pose.pose.orientation.w = rot.u;
-
-  odom_.twist.twist.linear.x = pos_iface_->data->velocity.pos.x;
-  odom_.twist.twist.linear.y = pos_iface_->data->velocity.pos.y;
-  odom_.twist.twist.angular.z = pos_iface_->data->velocity.yaw;
+  math::Vector3 linear = this->parent->GetWorldLinearVel();
+  odom_.twist.twist.linear.x = linear.x;
+  odom_.twist.twist.linear.y = linear.y;
+  odom_.twist.twist.angular.z = this->parent->GetWorldAngularVel().z;
 
   odom_.header.stamp = current_time;
   odom_.header.frame_id = odom_frame;
@@ -354,17 +326,25 @@ void DiffDrivePlugin::publish_odometry()
 // Update the data in the interface
 void DiffDrivePlugin::write_position_data()
 {
-  // TODO: Data timestamp
-  pos_iface_->data->head.time = Simulator::Instance()->GetSimTime().Double();
+  // // TODO: Data timestamp
+  // pos_iface_->data->head.time = Simulator::Instance()->GetSimTime().Double();
 
-  pos_iface_->data->pose.pos.x = odomPose[0];
-  pos_iface_->data->pose.pos.y = odomPose[1];
-  pos_iface_->data->pose.yaw = NORMALIZE(odomPose[2]);
+  // pose.pos.x = odomPose[0];
+  // pose.pos.y = odomPose[1];
+  // pose.rot.GetYaw() = NORMALIZE(odomPose[2]);
 
-  pos_iface_->data->velocity.pos.x = odomVel[0];
-  pos_iface_->data->velocity.yaw = odomVel[2];
+  // pos_iface_->data->velocity.pos.x = odomVel[0];
+  // pos_iface_->data->velocity.yaw = odomVel[2];
 
-  // TODO
-  pos_iface_->data->stall = 0;
+  math::Pose orig_pose = this->parent->GetWorldPose();
+
+  math::Pose new_pose = orig_pose;
+  new_pose.pos.x = odomPose[0];
+  new_pose.pos.y = odomPose[1];
+  new_pose.rot.SetFromEuler(math::Vector3(0,0,odomPose[2]));
+
+  this->parent->SetWorldPose( new_pose );
 }
 
+GZ_REGISTER_MODEL_PLUGIN(DiffDrivePlugin)
+}

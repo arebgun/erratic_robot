@@ -7,7 +7,7 @@
     </description>
 
     <author>Maintained by Antons Rebguns</author>
-    <license>BSD</license>  
+    <license>BSD</license>
     <review status="unreviewed" notes=""/>
     <url>http://ros.org/wiki/erratic_robot</url>
 
@@ -23,5 +23,4 @@
     <depend stack="common_msgs" />
     <depend stack="pr2_simulator" />
     <depend stack="arm_navigation" />
-    <depend stack="point_cloud_perception" />
 </stack>

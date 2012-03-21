@@ -1,8 +1,15 @@
 <launch>
+    <param name="/use_sim_time" value="true" />
 
-    <node name="gazebo" pkg="gazebo" type="gazebo" 
-          args="$(find gazebo_worlds)/worlds/empty.world" output="screen" respawn="false" />
-    
+    <node name="empty_world_server"
+          pkg="gazebo"
+          type="gazebo"
+          args="-u $(find gazebo_worlds)/worlds/empty.world"
+          respawn="false"
+          output="screen"/>
+
+    <node name="gazebo_gui" pkg="gazebo" type="gui" respawn="false" output="screen"/>
+
     <include file="$(find erratic_description)/launch/erratic_mobile_base.launch" />
 
 </launch>

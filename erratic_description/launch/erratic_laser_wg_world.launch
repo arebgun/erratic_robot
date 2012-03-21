@@ -1,4 +1,14 @@
 <launch>
-    <include file="$(find gazebo_worlds)/launch/wg_world.launch"/>
+    <param name="/use_sim_time" value="true" />
+
+    <node name="gazebo"
+          pkg="gazebo"
+          type="gazebo"
+          args="-u $(find gazebo_worlds)/worlds/wg_collada.world"
+          respawn="false"
+          output="screen"/>
+
+    <node name="gazebo_gui" pkg="gazebo" type="gui" respawn="false" output="screen"/>
+
     <include file="$(find erratic_description)/launch/erratic_laser_mobile_base.launch" />
 </launch>
