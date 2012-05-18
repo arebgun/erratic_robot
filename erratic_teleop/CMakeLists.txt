@@ -25,6 +25,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
 rosbuild_add_executable(erratic_keyboard_teleop src/keyboard.cpp)
+target_link_libraries(erratic_keyboard_teleop boost_thread)
+
 
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
