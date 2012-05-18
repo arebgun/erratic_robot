@@ -6,10 +6,11 @@
         proper Gazebo plugin, rather than a node that communicates with Gazebo. 
     </description>
 
-    <author>Daniel Hewlett</author>
+    <author>Daniel Hewlett, Antons Rebguns</author>
     <license>BSD</license>
     <review status="unreviewed" notes=""/>
     <url>http://ros.org/wiki/erratic_gazebo_plugins</url>
+
     <depend package="roscpp"/>
     <depend package="gazebo"/>
     <depend package="gazebo_plugins"/>

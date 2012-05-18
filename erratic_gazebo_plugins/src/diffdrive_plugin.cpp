@@ -32,16 +32,10 @@
 #include <erratic_gazebo_plugins/diffdrive_plugin.h>
 
 #include <gazebo.h>
-#include <common/Exception.hh>
-#include <math/Quaternion.hh>
-#include <math/Pose.hh>
-#include <physics/Joint.hh>
-#include <physics/Physics.hh>
-#include <physics/PhysicsEngine.hh>
-#include <physics/PhysicsTypes.hh>
-#include <physics/World.hh>
-#include <sdf/interface/SDF.hh>
-#include <sdf/interface/Param.hh>
+#include <common/common.h>
+#include <math/gzmath.h>
+#include <physics/physics.h>
+#include <sdf/sdf.h>
 
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>

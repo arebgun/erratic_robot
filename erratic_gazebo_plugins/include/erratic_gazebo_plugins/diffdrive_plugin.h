@@ -31,10 +31,8 @@
 #include <map>
 
 #include <gazebo.h>
-#include <common/Time.hh>
-#include <physics/Joint.hh>
-#include <physics/PhysicsTypes.hh>
-#include <physics/Model.hh>
+#include <common/common.h>
+#include <physics/physics.h>
 
 // ROS
 #include <ros/ros.h>
@@ -58,8 +56,6 @@ class Entity;
 
 class DiffDrivePlugin : public ModelPlugin
 {
-
-
   public: DiffDrivePlugin();
   public: ~DiffDrivePlugin();
   public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);

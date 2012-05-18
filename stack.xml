@@ -14,7 +14,7 @@
     <depend stack="ros" />
     <depend stack="ros_comm" />
     <depend stack="robot_model" />
-    <depend stack="common" />
+    <depend stack="xacro" />
     <depend stack="simulator_gazebo" />
     <depend stack="navigation" />
     <depend stack="laser_pipeline" />
