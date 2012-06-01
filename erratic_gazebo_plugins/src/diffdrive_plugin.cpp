@@ -31,7 +31,6 @@
 
 #include <erratic_gazebo_plugins/diffdrive_plugin.h>
 
-#include <gazebo.h>
 #include <common/common.h>
 #include <math/gzmath.h>
 #include <physics/physics.h>

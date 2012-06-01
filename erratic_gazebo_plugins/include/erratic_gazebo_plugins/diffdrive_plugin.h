@@ -30,7 +30,6 @@
 
 #include <map>
 
-#include <gazebo.h>
 #include <common/common.h>
 #include <physics/physics.h>
 
