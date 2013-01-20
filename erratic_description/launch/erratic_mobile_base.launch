@@ -6,14 +6,16 @@
 
     <!-- push robot_description to factory and spawn robot in gazebo -->
     <node name="spawn_robot" pkg="gazebo" type="spawn_model"
-          args="-param robot_description
+          args="-z 0.01
+                -unpause
                 -urdf
-                -z 0.01
-                -model robot_description"
+                -param robot_description
+                -model robot_description
+                -ros_namespace /gazebo"
           respawn="false" output="screen" />
 
     <!-- start robot state publisher -->
-    <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" output="screen" >
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" >
         <param name="publish_frequency" type="double" value="50.0" />
     </node>
 

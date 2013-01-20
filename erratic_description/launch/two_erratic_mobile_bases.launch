@@ -11,12 +11,14 @@
         <node name="spawn_robot1" pkg="gazebo" type="spawn_model"
               args="-param robot_description
                     -urdf
+                    -unpause
                     -z 0.01
-                    -model robot1"
+                    -model robot1
+                    -ros_namespace /gazebo"
               respawn="false" output="screen" />
               
         <!-- start robot state publisher -->
-        <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher1" output="screen" >
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher1" output="screen" >
             <param name="publish_frequency" type="double" value="50.0" />
         </node>
     </group>
@@ -31,13 +33,15 @@
         <node name="spawn_robot2" pkg="gazebo" type="spawn_model"
               args="-param robot_description
                     -urdf
+                    -unpause
                     -x 1.00
                     -z 0.01
-                    -model robot2"
+                    -model robot2
+                    -ros_namespace /gazebo"
               respawn="false" output="screen" />
               
         <!-- start robot state publisher -->
-        <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher2" output="screen" >
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher2" output="screen" >
             <param name="publish_frequency" type="double" value="50.0" />
         </node>
     </group>

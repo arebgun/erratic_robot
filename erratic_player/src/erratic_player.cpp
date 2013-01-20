@@ -138,7 +138,7 @@ public:
     ros::Subscriber cmd_vision_tilt_sub_;
     ros::Subscriber cmd_vision_pan_sub_;
     std::string tf_prefix_;
-    
+
     bool publish_tf_;
     double sigma_x_;
     double sigma_y_;
@@ -169,7 +169,7 @@ public:
         private_nh.param("enable_vision_pan_tilt", enable_vision_pan_tilt, false);
         private_nh.param("enable_ranger_tilt", enable_ranger_tilt, false);
         private_nh.param("publish_tf", publish_tf_, true);
-        private_nh.param("odometry_frame_id", odom_frame_id, string("odom"));
+        private_nh.param("odometry_frame_id", odom_frame_id, std::string("odom"));
 
         private_nh.param<double>("x_stddev", sigma_x_, 0.006);
         private_nh.param<double>("y_stddev", sigma_y_, 0.006);
@@ -464,11 +464,11 @@ public:
             msg.pose.covariance[7] = pow(sigma_y_, 2);
             msg.pose.covariance[35] = pow(sigma_theta_, 2);
         }
-        
+
         msg.pose.covariance[14] = DBL_MAX;
         msg.pose.covariance[21] = DBL_MAX;
         msg.pose.covariance[28] = DBL_MAX;
-        
+
         msg.twist.covariance = msg.pose.covariance;
     }
 
@@ -567,7 +567,7 @@ public:
             {
                 //ROS_INFO("Sonar(%d) = %f m", i, pdata->ranges[i]);
                 rangerArray.ranges[i].header.stamp = ros::Time::now();
-                rangerArray.ranges[i].header.frame_id = string("erratic_sonar_");
+                rangerArray.ranges[i].header.frame_id = std::string("erratic_sonar_");
                 rangerArray.ranges[i].header.frame_id += boost::lexical_cast<std::string>(i);
                 rangerArray.ranges[i].range = pdata->ranges[i];
 
@@ -596,7 +596,7 @@ public:
             for (uint32_t i = 0 ; i < pdata->ranges_count; ++i)
             {
                 rangerArray.ranges[i].header.stamp = timestamp;
-                rangerArray.ranges[i].header.frame_id = string("erratic_ir_");
+                rangerArray.ranges[i].header.frame_id = std::string("erratic_ir_");
                 rangerArray.ranges[i].header.frame_id += boost::lexical_cast<std::string>(i);
                 rangerArray.ranges[i].range = pdata->ranges[i];
                 rangerArray.ranges[i].radiation_type = sensor_msgs::Range::INFRARED;
