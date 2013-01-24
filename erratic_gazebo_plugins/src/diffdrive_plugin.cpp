@@ -285,7 +285,8 @@ void DiffDrivePlugin::publish_odometry()
   std::string base_footprint_frame = tf::resolve(tf_prefix_, "base_footprint");
 
   // getting data for base_footprint to odom transform
-  math::Pose pose = this->parent->GetState().GetPose();
+  gazebo::physics::ModelState state(this->parent);
+  math::Pose pose = state.GetPose();
 
   tf::Quaternion qt(pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w);
   tf::Vector3 vt(pose.pos.x, pose.pos.y, pose.pos.z);
