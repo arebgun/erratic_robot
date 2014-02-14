@@ -1,7 +1,6 @@
-
 VERSION = player_svn-r7125
 TARBALL = build/$(VERSION).tar.bz2
-TARBALL_URL = http://pr.willowgarage.com/downloads/$(VERSION).tar.bz2
+TARBALL_URL = http://download.ros.org/downloads/$(VERSION).tar.bz2
 SOURCE_DIR = build/player-svn
 TARBALL_PATCH = cmake-2.4-ros.patch
 UNPACK_CMD = tar xf
